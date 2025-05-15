@@ -1,59 +1,61 @@
 package task1.order;
 
+import task2.replaceMethodWithMethodObject.Customer;
+
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        Order order = new Order("Іван Петренко");
+        Customer customer = new Customer("Ivan Petrenko", false);
+        Order order = new Order(customer);
 
-        // Додавання товарів
-        OrderItem item1 = new OrderItem("Ноутбук", 25000.0, 1);
-        OrderItem item2 = new OrderItem("Мишка", 500.0, 2);
-        OrderItem item3 = new OrderItem("Клавіатура", 1200.0, 1);
+        // Adding items
+        OrderItem item1 = new OrderItem("Laptop", 25000.0, 1);
+        OrderItem item2 = new OrderItem("Mouse", 500.0, 2);
+        OrderItem item3 = new OrderItem("Keyboard", 1200.0, 1);
 
         order.addItem(item1);
         order.addItem(item2);
         order.addItem(item3);
 
-        // Виведення інформації про замовлення
-        System.out.println("Інформація про замовлення:");
-        System.out.println("Клієнт: " + order.getCustomerName());
-        System.out.println("Товари:");
+        // Displaying order information
+        System.out.println("Order Information:");
+        System.out.println("Customer: " + order.getCustomerName());
+        System.out.println("Items:");
 
         for (OrderItem item : order.getItems()) {
-            System.out.printf("- %s: %.2f грн x %d = %.2f грн%n",
+            System.out.printf("- %s: %.2f UAH x %d = %.2f UAH%n",
                     item.getName(),
                     item.getPrice(),
                     item.getQuantity(),
                     item.getTotalPrice());
         }
 
-        System.out.printf("Загальна вартість: %.2f грн%n", order.getTotalPrice());
+        System.out.printf("Total Price: %.2f UAH%n", order.getTotalPrice());
 
-        System.out.println("\nОбробка замовлення...");
+        System.out.println("\nProcessing order...");
 
         PaymentService paymentService = new PaymentService() {
             @Override
             public boolean processPayment(String customerName, double amount) {
-                System.out.printf("Обробка оплати для %s на суму %.2f грн... Успішно!%n",
+                System.out.printf("Processing payment for %s in the amount of %.2f UAH... Successful!%n",
                         customerName, amount);
                 return true;
             }
         };
 
-
         InventoryService inventoryService = new InventoryService() {
             @Override
             public boolean checkAvailability(List<OrderItem> items) {
-                System.out.println("Перевірка наявності товарів... Усі товари в наявності!");
+                System.out.println("Checking item availability... All items are in stock!");
                 return true;
             }
 
             @Override
             public void updateInventory(List<OrderItem> items) {
-                System.out.println("Оновлення кількості товарів на складі...");
+                System.out.println("Updating inventory quantities...");
                 for (OrderItem item : items) {
-                    System.out.printf("- %s: зменшено на %d шт.%n",
+                    System.out.printf("- %s: reduced by %d pcs.%n",
                             item.getName(), item.getQuantity());
                 }
             }
@@ -62,20 +64,17 @@ public class Main {
         NotificationService notificationService = new NotificationService() {
             @Override
             public void sendOrderConfirmation(Order order) {
-                System.out.printf("Відправлено підтвердження замовлення для %s на суму %.2f грн.%n",
+                System.out.printf("Order confirmation sent to %s for %.2f UAH.%n",
                         order.getCustomerName(), order.getTotalPrice());
             }
         };
 
-        // Створення процесора замовлень і обробка замовлення
         OrderProcessor processor = new OrderProcessor(
                 paymentService, inventoryService, notificationService);
 
         boolean result = processor.processOrder(order);
 
-        System.out.println("\nРезультат обробки замовлення: " +
-                (result ? "Успішно оброблено!" : "Виникла помилка під час обробки!"));
+        System.out.println("\nOrder processing result: " +
+                (result ? "Successfully processed!" : "An error occurred during processing!"));
     }
-
-
 }
